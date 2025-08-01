@@ -1,0 +1,36 @@
+services:
+  rust_app:
+    image: rust:latest
+    working_dir: /app
+    volumes:
+      - .:/app # mount the project directory
+    ports:
+      - "8000:8000"  
+    depends_on:
+      - postgres_db
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - my-network
+    command: bash -c "cargo install sea-orm-cli && sea-orm-cli migrate up && cargo build --release && ./target/release/cloudrep-service-desk-api"
+    # command: bash -c "cargo install cargo-watch && cargo install sea-orm-cli && sea-orm-cli migrate up && cargo watch -q -c -w /app -x run"
+
+  postgres_db:  # Changed from mysql_db
+    image: postgres:17.5
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # New environment variable for PostgreSQL password
+      POSTGRES_USER: ${POSTGRES_USER}        # New environment variable for PostgreSQL user
+      POSTGRES_DB: ${POSTGRES_DB}            # New environment variable for PostgreSQL database name
+      TZ: ${POSTGRES_TZ}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # New volume for PostgreSQL data
+    ports:
+      - "5432:5432"  # PostgreSQL default port
+    networks:
+      - my-network
+networks:
+  my-network:  # Define the network
+    driver: bridge
+volumes:
+  postgres_data:

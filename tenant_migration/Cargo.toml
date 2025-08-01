@@ -1,0 +1,10 @@
+[package]
+name = "tenant_migration"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sea-orm-migration = "0.12.14"
+sea-orm = { version = "0.12.14", features = ["runtime-tokio-rustls", "sqlx-postgres"] }
+async-trait = "0.1"
+tokio = { version = "1.36.0", features = ["full"] } 
